@@ -35,7 +35,7 @@ public final class BungeeExpansion extends PlaceholderExpansion implements Plugi
 
 
     private final Map<String, Integer>        counts = new HashMap<>();
-    private final AtomicReference<BukkitTask> cached = new AtomicReference<>();
+    private final AtomicReference<io.papermc.paper.threadedregions.scheduler.ScheduledTask> cached = new AtomicReference<>();
 
     private static Field inputField;
 
@@ -88,7 +88,7 @@ public final class BungeeExpansion extends PlaceholderExpansion implements Plugi
 
     @Override
     public void start() {
-        final BukkitTask task = Bukkit.getScheduler().runTaskTimer(getPlaceholderAPI(), () -> {
+        final io.papermc.paper.threadedregions.scheduler.ScheduledTask task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(getPlaceholderAPI(), (scheduledTask) -> {
 
             if (counts.isEmpty()) {
                 sendServersChannelMessage();
@@ -100,7 +100,7 @@ public final class BungeeExpansion extends PlaceholderExpansion implements Plugi
         }, 20L * 2L, 20L * getLong(CONFIG_INTERVAL, 30));
 
 
-        final BukkitTask prev = cached.getAndSet(task);
+        final io.papermc.paper.threadedregions.scheduler.ScheduledTask prev = cached.getAndSet(task);
         if (prev != null) {
             prev.cancel();
         } else {
@@ -111,7 +111,7 @@ public final class BungeeExpansion extends PlaceholderExpansion implements Plugi
 
     @Override
     public void stop() {
-        final BukkitTask prev = cached.getAndSet(null);
+        final io.papermc.paper.threadedregions.scheduler.ScheduledTask prev = cached.getAndSet(null);
         if (prev == null) {
             return;
         }
